@@ -6,8 +6,15 @@
 -- b) Н_СЕССИЯ.ЧЛВК_ИД > 100012.
 -- Вид соединения: INNER JOIN.
 
+drop INDEX "Н_ЛЮДИ_ИД";
+drop INDEX "Н_ЛЮДИ_ОТЧ";
+drop INDEX "Н_СЕСС_ЧЛВК_ИД";
 
-select Н_ЛЮДИ.ФАМИЛИЯ, Н_СЕССИЯ.УЧГОД
+CREATE INDEX "Н_ЛЮДИ_ИД" ON "Н_ЛЮДИ" USING HASH ("ИД");
+CREATE INDEX "Н_ЛЮДИ_ОТЧ" ON "Н_ЛЮДИ" USING HASH ("ОТЧЕСТВО");
+CREATE INDEX "Н_СЕСС_ЧЛВК_ИД" ON "Н_СЕССИЯ" USING BTREE ("ЧЛВК_ИД");
+
+explain analyse select Н_ЛЮДИ.ФАМИЛИЯ, Н_СЕССИЯ.УЧГОД
 from Н_ЛЮДИ
 inner join Н_СЕССИЯ on Н_СЕССИЯ.ЧЛВК_ИД = Н_ЛЮДИ.ИД
 where "ИМЯ" = 'Ярослав' and Н_СЕССИЯ.ЧЛВК_ИД > 100012;
@@ -24,8 +31,15 @@ where "ИМЯ" = 'Ярослав' and Н_СЕССИЯ.ЧЛВК_ИД > 100012;
 -- c) Н_СЕССИЯ.УЧГОД = 2008/2009.
 -- Вид соединения: RIGHT JOIN.
 
+drop INDEX "Н_ЛЮДИ_ИД";
+drop INDEX "Н_ЛЮДИ_ОТЧ";
 
-select Н_ЛЮДИ.ФАМИЛИЯ, Н_ВЕДОМОСТИ.ИД, Н_СЕССИЯ.ИД
+CREATE INDEX "Н_ЛЮДИ_ИД" ON "Н_ЛЮДИ" USING HASH ("ИД");
+CREATE INDEX "Н_ЛЮДИ_ОТЧ" ON "Н_ЛЮДИ" USING HASH ("ОТЧЕСТВО");
+CREATE INDEX " Н_ВЕД_ДАТА " ON "Н_ВЕДОМОСТИ" USING BTREE ("ДАТА");
+CREATE INDEX "Н_СЕССИЯ_УЧГОД" ON "Н_СЕССИЯ" USING HASH ("УЧГОД");
+
+explain analyse select Н_ЛЮДИ.ФАМИЛИЯ, Н_ВЕДОМОСТИ.ИД, Н_СЕССИЯ.ИД
 from Н_ЛЮДИ
 right join Н_ВЕДОМОСТИ on Н_ВЕДОМОСТИ.ЧЛВК_ИД = Н_ЛЮДИ.ИД
 right join Н_СЕССИЯ on Н_СЕССИЯ.ЧЛВК_ИД = Н_ЛЮДИ.ИД
